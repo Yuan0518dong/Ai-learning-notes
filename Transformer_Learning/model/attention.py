@@ -94,7 +94,7 @@ class MultiHeadAttention(nn.Module):
         # 5. [收尾] 最后的线性变换
         out = self.fc(out)
 
-        return out, attn
+        return out
 
 # ==============================================================================
 # 测试代码
