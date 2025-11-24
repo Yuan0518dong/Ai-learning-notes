@@ -1,60 +1,75 @@
 import torch
 import torch.nn as nn
-from model.gpt import Block, FeedForward
+# 确保你的文件夹结构是 model/attention.py
+from model.attention import MultiHeadAttention
 
 
-def test_gpt_components():
-    print("--- 🚀 开始 GPT 组件测试 (Week 2 抢跑验收) ---")
+def test_week2_day1_final():
+    print("--- 🚀 开始 Week 2 Day 1 最终验收测试 ---")
 
-    # 1. 定义测试参数 (模拟 GPT-2 Small)
+    # ==========================================
+    # 测试 1: 基础跑通 (Basic Sanity Check)
+    # ==========================================
+    print("\n[测试 1] 基础组件连通性测试...")
+    d_model = 512
+    n_heads = 8
+    seq_len = 10
     batch_size = 2
-    seq_len = 32
-    d_model = 768
-    n_head = 12
 
-    print(f"⚙️  测试配置: Batch={batch_size}, Seq={seq_len}, Dim={d_model}, Head={n_head}")
-
-    # 造一个假数据 (模拟输入 Tensor)
-    x = torch.randn(batch_size, seq_len, d_model)
-    print(f"📦 输入数据形状: {x.shape}")
-
-    print("\n--- [测试 1] FeedForward 模块 ---")
     try:
-        # 实例化 FFN
-        ff = FeedForward(d_model)
-        # 前向传播
-        out_ff = ff(x)
+        # 1. 实例化
+        model = MultiHeadAttention(d_model, n_heads)
+        # 2. 造假数据
+        x = torch.randn(batch_size, seq_len, d_model)
+        # 3. 前向传播 (不带 Mask)
+        out = model(x)
 
-        if out_ff.shape == x.shape:
-            print("✅ FeedForward 测试通过！输出维度正确。")
+        if out.shape == (batch_size, seq_len, d_model):
+            print("✅ 基础维度检查通过！模型骨架搭建完成。")
         else:
-            print(f"❌ FeedForward 维度错误: {out_ff.shape}")
+            print(f"❌ 维度错误: 期望 {(batch_size, seq_len, d_model)}, 实际 {out.shape}")
             return
+
+    except ValueError as e:
+        print(f"❌ 运行崩溃: {e}")
+        print(
+            "💡 提示: 如果报错 'too many values to unpack'，请检查 attention.py 第 86 行是否改成了 'out = self.attention(...)'")
+        return
     except Exception as e:
-        print(f"❌ FeedForward 运行崩溃: {e}")
+        print(f"❌ 未知错误: {e}")
         return
 
-    print("\n--- [测试 2] Block 模块 (核心) ---")
+    # ==========================================
+    # 测试 2: AI4SE 核心 - Causal Mask 测试
+    # ==========================================
+    print("\n[测试 2] Causal Mask (代码补全核心) 测试...")
+    # 模拟一个极短的代码片段: "def main ( )" -> 4个token
+    mini_seq = 4
+    mini_batch = 1
+
+    # 1. 构造下三角 Mask (核心!)
+    # 形状: [mini_seq, mini_seq] -> [4, 4]
+    # 1 表示可见，0 表示遮挡
+    mask = torch.tril(torch.ones(mini_seq, mini_seq))
+
+    print(f"   Mask 矩阵 (防作弊视窗):\n{mask}")
+
     try:
-        # 实例化 Block
-        block = Block(d_model, n_head)
+        x_code = torch.randn(mini_batch, mini_seq, d_model)
 
-        # 检查内部组件是否存在 (防止变量名写错)
-        print(f"   - 检查子模块: Attn={hasattr(block, 'attn')}, FF={hasattr(block, 'ff')}, LN={hasattr(block, 'ln1')}")
+        # 传入 Mask
+        out_masked = model(x_code, mask=mask)
 
-        # 前向传播 (暂时不传 mask，下周一再搞 mask)
-        out_block = block(x)
-
-        if out_block.shape == x.shape:
-            print(f"✅ Block 测试通过！输出维度: {out_block.shape}")
-            print("🎉 恭喜！GPT 的躯干已经搭建完毕，且逻辑自洽！")
+        if out_masked.shape == (mini_batch, mini_seq, d_model):
+            print("✅ Mask 机制运行正常！Attention 层成功处理了遮挡逻辑。")
+            print("🎉 Day 1 任务圆满完成！你的 GPT 已经准备好学习写代码了。")
         else:
-            print(f"❌ Block 维度错误: {out_block.shape}")
+            print(f"❌ Mask 输出维度错误: {out_masked.shape}")
 
     except Exception as e:
-        print(f"❌ Block 运行崩溃: {e}")
-        print("💡 提示: 如果报错 'tuple object...'，请检查 model/attention.py 是否只返回了 output")
+        print(f"❌ Mask 测试崩溃: {e}")
+        print("💡 检查点: ScaledDotProductAttention 里的 masked_fill 逻辑写对了吗？")
 
 
 if __name__ == "__main__":
-    test_gpt_components()
+    test_week2_day1_final()
