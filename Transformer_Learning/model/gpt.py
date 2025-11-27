@@ -105,7 +105,7 @@ class GPT(nn.Module):
 
     #我们需要定义整个网络的骨架：Embedding -> Blocks -> Final Norm -> Output Head
 
-    def __init__(self, vocab_size, d_model, n_layer, n_head, max_len=1024):
+    def __init__(self, vocab_size, d_model, n_layer, n_head, max_len=1024,dropout=0.1):
         super().__init__()
         # === 1. 零件准备：入口 ===
         # 词嵌入：把 "101" 这种数字变成一个向量 [0.1, -0.5, ...] (代表"语义")
@@ -119,7 +119,7 @@ class GPT(nn.Module):
         # 我们用 ModuleList 像装子弹一样，装入 n_layer 个 Block
         # 每个 Block 都能提取更高级的特征（语法 -> 语义 -> 逻辑）
         self.blocks = nn.ModuleList([
-            Block(d_model, n_head) for _ in range(n_layer)
+            Block(d_model, n_head,dropout=dropout) for _ in range(n_layer)
         ])
 
         # === 3. 零件准备：出口 ===
@@ -186,6 +186,6 @@ class GPT(nn.Module):
             # 对这 B*T 个位置，算出预测值和真实值的差距。
             loss = F.cross_entropy(B_T_logits, B_T_targets)
 
-        return logits, loss
+        return logits
 
 
