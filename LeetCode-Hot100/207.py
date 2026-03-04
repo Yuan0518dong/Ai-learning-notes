@@ -26,6 +26,7 @@ from scipy.cluster.hierarchy import complete
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
         # 构建邻接表
+        #遍历 range(numCourses) 次，每次生成一个空列表，最终组合成一个二维列表
         graph = [[] for _ in range(numCourses)] # 邻接表，索引为课程，值为后续课程列表
         in_degree = [0] * numCourses #构造入度数组，记录每个课程的先修课数量
 
