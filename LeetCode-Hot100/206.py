@@ -17,16 +17,16 @@ class ListNode:
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
         # 双指针法 (迭代)
-        prev = None
-        curr = head
+        prev = None  #初始化前指针：指向「当前节点的前一个节点」，初始为None
+        curr = head  # 初始化当前指针：指向「正在处理的节点」，初始为原链表头
         while curr is not None:
-            temp = curr.next
+            temp = curr.next #临时变量：保存当前节点的下一个节点（避免反转后丢失后续链表）
 
             # 反转指针
-            curr.next = prev
-            prev = curr
+            curr.next = prev    #反转：让当前节点的next指向「前一个节点」（原本指向后一个）
+            prev = curr         #前指针后移：prev更新为当前节点（为下一次反转做准备）
 
-            curr = temp
+            curr = temp         #当前指针后移：curr更新为之前保存的「原下一个节点」
 
         return prev
 
